@@ -67,3 +67,9 @@ export default {
     name: 'FrontendNavbar'
 }
 </script>
+
+<style lang="css">
+  .router-link-active, .router-link-exact-active{
+    color: purple;
+  }
+</style>

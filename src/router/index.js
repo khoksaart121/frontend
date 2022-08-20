@@ -25,7 +25,11 @@ const routes = [
         path: '/',
         component: Home
       }
-    ]
+    ],
+    meta: {
+      title: 'หน้าหลัก',
+      description: 'หน้าหลักระบบคลังสินค้า'
+    }
   },
   {
     path: '/about',
@@ -37,7 +41,11 @@ const routes = [
         name: 'About',
         component: About
       }
-    ]
+    ],
+    meta: {
+      title: 'เกี่ยวกับเรา',
+      description: 'รายละเอียดหน้าเกี่ยวกับเรา'
+    }
   },
   {
     path: '/portfolio',
@@ -49,7 +57,11 @@ const routes = [
         name: 'Portfolio',
         component: Portfolio
       }
-    ]
+    ],
+    meta: {
+      title: 'ผลงานของเรา',
+      description: 'รายละเอียดหน้าผลงานของเรา'
+    }
   },
   {
     path: '/service',
@@ -61,7 +73,11 @@ const routes = [
         name: 'Service',
         component: Service
       }
-    ]
+    ],
+    meta: {
+      title: 'บริการของเรา',
+      description: 'รายละเอียดหน้าบริการของเรา'
+    }
   },
   {
     path: '/contact',
@@ -73,7 +89,11 @@ const routes = [
         name: 'Contact',
         component: Contact
       }
-    ]
+    ],
+    meta: {
+      title: 'ติดต่อเรา',
+      description: 'รายละเอียดหน้าติดต่อเรา'
+    }
   },
   {
     path: '/register',
@@ -85,7 +105,11 @@ const routes = [
         name: 'Register',
         component: Register
       }
-    ]
+    ],
+    meta: {
+      title: 'สมัครสมาชิกใหม่',
+      description: 'รายละเอียดหน้าสมัครสมาชิกใหม่'
+    }
   },
   {
     path: '/login',
@@ -97,7 +121,11 @@ const routes = [
         name: 'Login',
         component: Login
       }
-    ]
+    ],
+    meta: {
+      title: 'เข้าสู่ระบบ',
+      description: 'รายละเอียดหน้าเข้าสู่ระบบ'
+    }
   },
   {
     path: '/forgotPassword',
@@ -109,13 +137,21 @@ const routes = [
         name: 'ForgotPassword',
         component: ForgotPassword
       }
-    ]
+    ],
+    meta: {
+      title: 'ลืมรหัสผ่าน',
+      description: 'รายละเอียดหน้าลืมรหัสผ่าน'
+    }
   },
 
   // Error 404
   {
     path: '/:catchAll(.*)',
     component: NotFound404,
+    meta: {
+      title: '404 ไม่พบหน้านี้',
+      description: 'รายละเอียดหน้า 404'
+    }
   }
 ]
 

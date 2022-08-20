@@ -24,20 +24,23 @@
               <form @submit.prevent="onSubmit">
 
                 <label class="block mt-3 mb-2 text-sm text-gray-700" for="email">อีเมล์</label>
-                <input v-model="email" class="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none" type="text" >
+                <input v-model="email" class="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none" id="email" type="text" autocomplete="email">
                 <div v-if="v$.email.$error" class="mt-2 text-sm text-red-500">
-                  {{ v$.email.$errors[0].$message }}
+                  {{v$.email.$errors[0].$message}}
                 </div>
 
                 <label class="block mt-3 mb-2 text-sm text-gray-700" for="password">รหัสผ่าน</label>
-                <input v-model="password" class="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none" type="password">
+                <input v-model="password" class="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none" id="password" type="password" autocomplete="current-password">
                 <div v-if="v$.password.$error" class="mt-2 text-sm text-red-500">
-                  {{ v$.password.$errors[0].$message }}
+                  {{v$.password.$errors[0].$message}}
                 </div>
 
+
                 <p class="my-4"></p>
+
                 
-                <button @click="submitForm" class="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg cursor-pointer active:bg-purple-600 hover:bg-purple-700">เข้าสู่ระบบ</button>
+                <button @click="submitForm"
+                    class="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg cursor-pointer active:bg-purple-600 hover:bg-purple-700">เข้าสู่ระบบ</button>
               </form>
 
               <p class="my-8"></p>
@@ -82,7 +85,67 @@
 </template>
 
 <script>
+
+import useValidate from '@vuelidate/core'
+import {required, email, minLength, helpers} from '@vuelidate/validators'
+
+import http from '@/services/AuthService'
+
 export default {
-    name: 'FrontendLogin'
+  data(){
+    return{
+      v$: useValidate(),
+      email: '',
+      password: ''
+    }
+  },
+  methods:{
+    submitForm(){
+      // alert(id)
+      this.v$.$validate(); // checks all input
+      if(!this.v$.$error){
+        // ถ้า validate ผ่าน
+        // alert('Form validate success')
+        // เรียกใช้งาน API Login จาก Laravel
+        http.post('login',
+          {
+            "email": this.email,
+            "password": this.password
+          }
+        ).then(response => {
+          console.log(response.data)
+          // เก็บข้อมูล user ลง localStorage
+          localStorage.setItem('user', JSON.stringify(response.data))
+
+          // เมื่อล็อกอินผ่านส่งไปหน้า dashboard
+          this.$router.push('backend')
+        }).catch(error => {
+          if(error.response){
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          }
+        })
+      }else{
+        // alert('Form validate fail!')
+      }
+    }
+  },
+  validations(){
+    return{
+      email: {
+        required: helpers.withMessage('ป้อนอีเมล์ก่อน', required), 
+        email: helpers.withMessage('รูปแบบอีเมล์ไม่ถูกต้อง', email)
+      },
+      password: {
+        required: helpers.withMessage('ป้อนรหัสผ่านก่อน', required),
+        minLength: helpers.withMessage(
+          ({$params}) => `รหัสผ่านต้องไม่น้อยกว่า ${$params.min} ตัวอักษร`,
+          minLength(6)
+        )
+      }
+    }
+  },
+  name: 'FrontendLogin',
 }
 </script>
