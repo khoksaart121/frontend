@@ -85,67 +85,117 @@
 </template>
 
 <script>
+import useValidate from "@vuelidate/core";
+import { required, email, minLength, helpers } from "@vuelidate/validators";
 
-import useValidate from '@vuelidate/core'
-import {required, email, minLength, helpers} from '@vuelidate/validators'
-
-import http from '@/services/AuthService'
+import http from "@/services/AuthService";
 
 export default {
-  data(){
-    return{
+  data() {
+    return {
       v$: useValidate(),
-      email: '',
-      password: ''
-    }
+      email: "",
+      password: "",
+    };
   },
-  methods:{
-    submitForm(){
+  methods: {
+    submitForm() {
       // alert(id)
       this.v$.$validate(); // checks all input
-      if(!this.v$.$error){
+      if (!this.v$.$error) {
         // ถ้า validate ผ่าน
         // alert('Form validate success')
         // เรียกใช้งาน API Login จาก Laravel
-        http.post('login',
-          {
-            "email": this.email,
-            "password": this.password
-          }
-        ).then(response => {
-          console.log(response.data)
-          // เก็บข้อมูล user ลง localStorage
-          localStorage.setItem('user', JSON.stringify(response.data))
+        http
+          .post("login", {
+            email: this.email,
+            password: this.password,
+          })
+          .then((response) => {
+            console.log(response.data);
+            // เก็บข้อมูล user ลง localStorage
+            localStorage.setItem("user", JSON.stringify(response.data));
 
-          // เมื่อล็อกอินผ่านส่งไปหน้า dashboard
-          this.$router.push('backend')
-        }).catch(error => {
-          if(error.response){
-            console.log(error.response.data);
-            console.log(error.response.status);
-            console.log(error.response.headers);
-          }
-        })
-      }else{
+            const Toast = this.$swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener("mouseenter", this.$swal.stopTimer);
+                toast.addEventListener("mouseleave", this.$swal.resumeTimer);
+              },
+            });
+
+            Toast.fire({
+              icon: "success",
+              title: "กำลังเข้าสู่ระบบ...",
+            }).then(()=>{
+              // เมื่อล็อกอินผ่านส่งไปหน้า dashboard
+              this.$router.push("backend");
+            });
+
+            
+          })
+          .catch((error) => {
+            if (error.response) {
+              // console.log(error.response.data);
+              // console.log(error.response.status);
+              // console.log(error.response.headers);
+
+              if (error.response.status == 401) {
+                // เรียกใช้งาน popup ของ sweetalert2
+                //  this.$swal({
+                //   position: 'top-end',
+                //   icon: 'error',
+                //   title: 'ข้อมูลเข้าสู่ระบบไม่ถูกต้อง',
+                //   showConfirmButton: false,
+                //   timer: 1500
+                //  });
+
+                const Toast = this.$swal.mixin({
+                  toast: true,
+                  position: "top-end",
+                  showConfirmButton: false,
+                  timer: 1500,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener("mouseenter", this.$swal.stopTimer);
+                    toast.addEventListener(
+                      "mouseleave",
+                      this.$swal.resumeTimer
+                    );
+                  },
+                });
+
+                Toast.fire({
+                  icon: "error",
+                  title: "ข้อมูลเข้าสู่ระบบไม่ถูกต้อง",
+                });
+              }
+            }
+          });
+      } else {
         // alert('Form validate fail!')
       }
-    }
+    },
   },
-  validations(){
-    return{
+  validations() {
+    return {
       email: {
-        required: helpers.withMessage('ป้อนอีเมล์ก่อน', required), 
-        email: helpers.withMessage('รูปแบบอีเมล์ไม่ถูกต้อง', email)
+        required: helpers.withMessage("ป้อนอีเมล์ก่อน", required),
+        email: helpers.withMessage("รูปแบบอีเมล์ไม่ถูกต้อง", email),
       },
       password: {
-        required: helpers.withMessage('ป้อนรหัสผ่านก่อน', required),
+        required: helpers.withMessage("ป้อนรหัสผ่านก่อน", required),
         minLength: helpers.withMessage(
-          ({$params}) => `รหัสผ่านต้องไม่น้อยกว่า ${$params.min} ตัวอักษร`,
+          ({ $params }) => `รหัสผ่านต้องไม่น้อยกว่า ${$params.min} ตัวอักษร`,
           minLength(6)
-        )
-      }
-    }
+        ),
+      },
+    };
   },
-  name: 'FrontendLogin',
-}
+  name: "FrontendLogin",
+};
 </script>
